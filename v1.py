@@ -151,6 +151,7 @@ def check_for_pause_command():
         elif command == "20min":
             pause_time = 1200  # 20 minutes in seconds
             pause_event.set()
+        #break?
 
 capture_interval = 15  # Capture frame every 20 seconds for testing
 capture_thread = threading.Thread(target=capture_and_process_frames)

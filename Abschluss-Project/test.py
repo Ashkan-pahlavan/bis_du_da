@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import pickle
 import csv
 import threading
+import random
 from win32com.client import Dispatch
 
 def speak(message):
@@ -62,7 +63,7 @@ def process_frame(frame):
     return frame, attendance
 
 def capture_and_process_frames():
-    global attendance_data, processed_frame, camera_busy
+    global attendance_data, processed_frame, camera_busy, capture_interval
     while True:
         if pause_event.is_set():
             start_pause_time = time.time()
@@ -73,8 +74,8 @@ def capture_and_process_frames():
         if not camera_busy:
             camera_busy = True
             video = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use DirectShow backend
-            video.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Lower resolution
-            video.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Lower resolution
+            video.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Higher resolution
+            video.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Higher resolution
             start_time = time.time()
             detected = False
             while time.time() - start_time < 5:  # Try for 5 seconds
@@ -99,6 +100,7 @@ def capture_and_process_frames():
                 attendance_data.append(["Unknown", timestamp, "false"])
             save_attendance()
             camera_busy = False
+            capture_interval = random.uniform(10, 55)  # Random interval between 10 to 55 seconds
             time.sleep(capture_interval)
 
 def record_pause_start(start_time):
@@ -151,8 +153,10 @@ def check_for_pause_command():
         elif command == "20min":
             pause_time = 1200  # 20 minutes in seconds
             pause_event.set()
+        else:
+            print("Invalid command. Please enter '10min' or '20min'.")
 
-capture_interval = 15  # Capture frame every 20 seconds for testing
+capture_interval = random.uniform(10, 55)  # Random interval between 10 to 55 seconds for testing
 capture_thread = threading.Thread(target=capture_and_process_frames)
 capture_thread.start()
 
