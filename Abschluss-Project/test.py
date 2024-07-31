@@ -8,6 +8,7 @@ import pickle
 import csv
 import threading
 from win32com.client import Dispatch
+import queue
 
 def speak(message):
     speak = Dispatch("SAPI.SpVoice")
@@ -38,9 +39,10 @@ COL_NAMES = ['NAME', 'TIME', 'STATUS']
 
 camera_busy = False
 processed_frame = None
-attendance_data = []
+attendance_queue = queue.Queue()
 pause_time = 0
 pause_event = threading.Event()
+capture_interval = 15  # Capture frame every 15 seconds
 
 def process_frame(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -51,8 +53,7 @@ def process_frame(frame):
         resized_img = cv2.resize(crop_img, (50, 50)).flatten().reshape(1, -1)
         output = knn.predict(resized_img)
         ts = time.time()
-        date = datetime.fromtimestamp(ts).strftime("%d-%m-%Y")
-        timestamp = datetime.fromtimestamp(ts).strftime("%H:%M-%S")
+        timestamp = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 1)
         cv2.rectangle(frame, (x, y), (x+w, y+h), (50, 50, 255), 2)
         cv2.rectangle(frame, (x, y-40), (x+w, y), (50, 50, 255), -1)
@@ -62,7 +63,7 @@ def process_frame(frame):
     return frame, attendance
 
 def capture_and_process_frames():
-    global attendance_data, processed_frame, camera_busy
+    global attendance_queue, processed_frame, camera_busy
     while True:
         if pause_event.is_set():
             start_pause_time = time.time()
@@ -85,7 +86,7 @@ def capture_and_process_frames():
                 processed_frame, attendance = process_frame(frame)
                 cv2.imshow("Camera", processed_frame)
                 if attendance:
-                    attendance_data.append(attendance)
+                    attendance_queue.put(attendance)
                     detected = True
                     break  # Stop processing after the first valid result
                 if cv2.waitKey(1) == ord('q'):
@@ -94,22 +95,21 @@ def capture_and_process_frames():
             cv2.destroyAllWindows()
             if not detected:
                 ts = time.time()
-                date = datetime.fromtimestamp(ts).strftime("%d-%m-%Y")
-                timestamp = datetime.fromtimestamp(ts).strftime("%H:%M-%S")
-                attendance_data.append(["Unknown", timestamp, "false"])
+                timestamp = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+                attendance_queue.put(["Unknown", timestamp, "false"])
             save_attendance()
             camera_busy = False
             time.sleep(capture_interval)
 
 def record_pause_start(start_time):
     date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
-    timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M-%S")
+    timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
     pause_record = ["Paused", timestamp, "Start"]
     save_pause_record(pause_record, date)
 
 def record_pause_end(end_time):
     date = datetime.fromtimestamp(end_time).strftime("%d-%m-%Y")
-    timestamp = datetime.fromtimestamp(end_time).strftime("%H:%M-%S")
+    timestamp = datetime.fromtimestamp(end_time).strftime("%H:%M:%S")
     pause_record = ["Paused", timestamp, "End"]
     save_pause_record(pause_record, date)
 
@@ -125,34 +125,32 @@ def save_pause_record(record, date):
         writer.writerow(record)
 
 def save_attendance(record=None):
-    global attendance_data
-    if record is None and len(attendance_data) > 0:
-        record = attendance_data.pop(0)
+    global attendance_queue
+    if record is None and not attendance_queue.empty():
+        record = attendance_queue.get()
     if record:
         date = datetime.fromtimestamp(time.time()).strftime("%d-%m-%Y")
-        exist = os.path.isfile(f"Attendance/Attendance_{date}.csv")
-        if exist:
-            with open(f"Attendance/Attendance_{date}.csv", "a") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(record)
-        else:
-            with open(f"Attendance/Attendance_{date}.csv", "a") as csvfile:
-                writer = csv.writer(csvfile)
+        if not os.path.exists("Attendance"):
+            os.makedirs("Attendance")
+        file_path = f"Attendance/Attendance_{date}.csv"
+        exist = os.path.isfile(file_path)
+        with open(file_path, "a") as csvfile:
+            writer = csv.writer(csvfile)
+            if not exist:
                 writer.writerow(COL_NAMES)
-                writer.writerow(record)
+            writer.writerow(record)
 
 def check_for_pause_command():
     global pause_time, pause_event
     while True:
         command = input("Enter command (10min or 20min to pause): ").strip()
         if command == "10min":
-            pause_time = 40  # 10 minutes in seconds
+            pause_time = 10 * 60  # 10 minutes in seconds
             pause_event.set()
         elif command == "20min":
-            pause_time = 1200  # 20 minutes in seconds
+            pause_time = 20 * 60  # 20 minutes in seconds
             pause_event.set()
 
-capture_interval = 15  # Capture frame every 20 seconds for testing
 capture_thread = threading.Thread(target=capture_and_process_frames)
 capture_thread.start()
 
