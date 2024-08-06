@@ -10,17 +10,17 @@ class FaceDetectionApp:
         self.root = tk.Tk()
         self.root.title("Face Detection")
         self.root.geometry("400x300")
-        self.root.configure(bg='#f0f0f0')
+        self.root.configure(bg='#2c3e50')  # Dark blue background
 
         # Create an entry field for name
-        name_label = tk.Label(self.root, text="Enter Your Name:", bg='#f0f0f0', font=("Helvetica", 14))
+        name_label = tk.Label(self.root, text="Enter Your Name:", bg='#2c3e50', fg="white", font=("Helvetica", 14))
         name_label.pack(pady=(20, 10))
 
         self.name_entry = tk.Entry(self.root, font=("Helvetica", 14), width=30)
         self.name_entry.pack(pady=(0, 20))
 
         # Create a button to start face detection
-        start_button = tk.Button(self.root, text="Start Face Detection", bg="#4CAF50", fg="white", font=("Helvetica", 14), command=self.start_face_detection)
+        start_button = tk.Button(self.root, text="Start Face Detection", bg="#27ae60", fg="white", font=("Helvetica", 14), command=self.start_face_detection, relief="flat", bd=0)
         start_button.pack(pady=(10, 20))
 
         self.root.mainloop()

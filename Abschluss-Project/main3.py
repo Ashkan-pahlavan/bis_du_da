@@ -8,11 +8,15 @@ import pickle
 import csv
 import threading
 import random
-from win32com.client import Dispatch
 import tkinter as tk
 from tkinter import messagebox
+from win32com.client import Dispatch
+import requests
+import json
+from decimal import Decimal, InvalidOperation
 
 # Constants
+API_URL = 'https://55ixs3z8q0.execute-api.eu-central-1.amazonaws.com/st'  # آدرس URL API Gateway شما
 FACEDETECT_PATH = 'data/haarcascade_frontalface_default.xml'
 NAMES_PATH = 'data/names.pkl'
 FACES_DATA_PATH = 'data/faces_data.pkl'
@@ -51,22 +55,22 @@ class FaceRecognitionApp:
     def _initialize_gui(self):
         """Initialize the GUI."""
         self.root = tk.Tk()
-        self.root.title("Identify")
-        self.root.geometry("800x400")
-        self.root.configure(bg='#f0f0f0')
+        self.root.title("Face Recognition and Detection")
+        self.root.geometry("950x400")
+        self.root.configure(bg='#2c3e50')  # Dark blue background
 
-        # Create and place buttons
-        self._create_button("Start", "#4CAF50", self.start_button_click, 0)
-        self._create_button("10 Minuten Pause", "#FFEB3B", self.zehn_minuten_pause_click, 1)
-        self._create_button("20 Minuten Pause", "#FFC107", self.zwanzig_minuten_pause_click, 2)
-        self._create_button("Ende", "#F44336", self.ende_button_click, 3)
+        # Create and place buttons for attendance
+        self._create_button("Start Attendance", "#27ae60", self.start_attendance, 0)
+        self._create_button("10 Minuten Pause", "#f1c40f", self.zehn_minuten_pause_click, 1)
+        self._create_button("20 Minuten Pause", "#e67e22", self.zwanzig_minuten_pause_click, 2)
+        self._create_button("Ende", "#e74c3c", self.ende_button_click, 3)
 
         # Create a Canvas widget for dynamic field
         self.canvas = tk.Canvas(self.root, width=600, height=200, bg="white", bd=2, relief="solid")
         self.canvas.grid(row=1, column=0, columnspan=4, pady=20)
 
-        # Create a label for "ausname"
-        ausname_label = tk.Label(self.root, text="Ausname", relief="solid", width=15, height=2, bg="#f0f0f0", font=("Helvetica", 12))
+        # Create a label for "Ausname"
+        ausname_label = tk.Label(self.root, text="Ausname", relief="solid", width=15, height=2, bg="#2c3e50", fg="white", font=("Helvetica", 12))
         ausname_label.grid(row=1, column=4, padx=20, pady=20)
 
         # Start the application
@@ -74,18 +78,18 @@ class FaceRecognitionApp:
 
     def _create_button(self, text, color, command, column):
         """Helper method to create a button."""
-        button = tk.Button(self.root, text=text, bg=color, fg="white", font=("Helvetica", 12), command=command, padx=20, pady=10)
+        button = tk.Button(self.root, text=text, bg=color, fg="white", font=("Helvetica", 12), command=command, padx=20, pady=10, relief="flat", bd=0)
         button.grid(row=0, column=column, padx=20, pady=20)
 
-    def start_button_click(self):
+    def start_attendance(self):
         """Handle start button click."""
-        messagebox.showinfo("Info", "Start-Button wurde geklickt")
+        messagebox.showinfo("Info", "Start Attendance")
         threading.Thread(target=self.capture_and_process_frames, daemon=True).start()
 
     def zehn_minuten_pause_click(self):
         """Handle 10-minute pause button click."""
         messagebox.showinfo("Info", "10 Minuten Pause-Button wurde geklickt")
-        self.pause_time = 60  # 10 minutes in seconds
+        self.pause_time = 600  # 10 minutes in seconds
         self.pause_event.set()
 
     def zwanzig_minuten_pause_click(self):
@@ -96,6 +100,7 @@ class FaceRecognitionApp:
 
     def ende_button_click(self):
         """Handle end button click."""
+        self.send_attendance_to_api()
         messagebox.showinfo("Info", "Ende-Button wurde geklickt")
         self.root.quit()
 
@@ -110,7 +115,7 @@ class FaceRecognitionApp:
         faces = self.facedetect.detectMultiScale(gray, 1.3, 5)
         attendance = []
         for (x, y, w, h) in faces:
-            crop_img = frame[y:y+h, x:x+w, :]
+            crop_img = frame[y:y+h, x:x+w]
             resized_img = cv2.resize(crop_img, (50, 50)).flatten().reshape(1, -1)
             output = self.knn.predict(resized_img)
             timestamp = datetime.now().strftime("%H:%M:%S")
@@ -206,6 +211,71 @@ class FaceRecognitionApp:
             if not exist:
                 writer.writerow(headers)
             writer.writerow(record)
+
+    def analyze_attendance(self):
+        attendance_dir = 'Attendance'
+        results = []
+
+        attendance_files = [f for f in os.listdir(attendance_dir) if f.startswith("Attendance_") and f.endswith(".csv")]
+        attendance_files.sort(key=lambda x: datetime.strptime(x.split("_")[1].split(".")[0], "%d-%m-%Y"), reverse=True)
+
+        for filename in attendance_files:
+            date_str = filename.split("_")[1].split(".")[0]
+            date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+
+            true_count = 0
+            false_count = 0
+            total_count = 0
+            name = None  # Initialize name variable
+
+            with open(os.path.join(attendance_dir, filename), 'r') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    total_count += 1
+                    name = row['NAME']  # Get the name from the row
+                    if row['STATUS'] == 'true':
+                        true_count += 1
+                    elif row['STATUS'] == 'false':
+                        false_count += 1
+
+            if total_count > 0:
+                try:
+                    true_percentage = Decimal(true_count) / Decimal(total_count) * Decimal(100)
+                    false_percentage = Decimal(false_count) / Decimal(total_count) * Decimal(100)
+
+                    results.append({
+                        'name': name,  # Add the name to the results
+                        'date': date,
+                        'true_percentage': str(round(true_percentage, 1)),  # Convert to string
+                        'false_percentage': str(round(false_percentage, 1))  # Convert to string
+                    })
+                except InvalidOperation:
+                    print("InvalidOperation error occurred while calculating percentages.")
+                    continue
+
+        return results
+
+    def send_to_api(self, data):
+        try:
+            # Wrap the data in a JSON body as required by your API Gateway
+            payload = {
+                "body": json.dumps(data)
+            }
+            response = requests.post(API_URL, json=payload)
+            if response.status_code == 200:
+                print("Data successfully sent to API.")
+            else:
+                print(f"Failed to send data. Status code: {response.status_code}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    def send_attendance_to_api(self):
+        attendance_data = self.analyze_attendance()
+        if attendance_data:
+            last_record = attendance_data[0]  # Get the latest record
+            self.send_to_api(last_record)  # Send only the latest record
+            print("Data has been sent to API:")
+            print(json.dumps(last_record, indent=2, default=str))
 
 if __name__ == "__main__":
     app = FaceRecognitionApp()
