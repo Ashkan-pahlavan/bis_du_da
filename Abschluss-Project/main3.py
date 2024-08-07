@@ -13,10 +13,10 @@ from tkinter import messagebox
 from win32com.client import Dispatch
 import requests
 import json
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 # Constants
-API_URL = 'https://55ixs3z8q0.execute-api.eu-central-1.amazonaws.com/st'  # آدرس URL API Gateway شما
+API_URL = 'https://55ixs3z8q0.execute-api.eu-central-1.amazonaws.com/st'
 FACEDETECT_PATH = 'data/haarcascade_frontalface_default.xml'
 NAMES_PATH = 'data/names.pkl'
 FACES_DATA_PATH = 'data/faces_data.pkl'
@@ -30,11 +30,10 @@ class FaceRecognitionApp:
         self.camera_busy = False
         self.processed_frame = None
         self.pause_time = 0
-        self.capture_interval = random.uniform(10, 55)  # Random interval between 10 to 55 seconds for testing
+        self.capture_interval = random.uniform(10, 55)
         self._initialize_gui()
 
     def _load_models(self):
-        """Load face detection and recognition models."""
         if not os.path.isfile(FACEDETECT_PATH):
             messagebox.showerror("Error", f"File {FACEDETECT_PATH} not found.")
             exit()
@@ -53,64 +52,52 @@ class FaceRecognitionApp:
         self.knn.fit(self.faces, self.labels)
 
     def _initialize_gui(self):
-        """Initialize the GUI."""
         self.root = tk.Tk()
         self.root.title("Face Recognition and Detection")
         self.root.geometry("950x400")
-        self.root.configure(bg='#2c3e50')  # Dark blue background
+        self.root.configure(bg='#2c3e50')
 
-        # Create and place buttons for attendance
         self._create_button("Start Attendance", "#27ae60", self.start_attendance, 0)
         self._create_button("10 Minuten Pause", "#f1c40f", self.zehn_minuten_pause_click, 1)
         self._create_button("20 Minuten Pause", "#e67e22", self.zwanzig_minuten_pause_click, 2)
         self._create_button("Ende", "#e74c3c", self.ende_button_click, 3)
 
-        # Create a Canvas widget for dynamic field
         self.canvas = tk.Canvas(self.root, width=600, height=200, bg="white", bd=2, relief="solid")
         self.canvas.grid(row=1, column=0, columnspan=4, pady=20)
 
-        # Create a label for "Ausname"
         ausname_label = tk.Label(self.root, text="Ausname", relief="solid", width=15, height=2, bg="#2c3e50", fg="white", font=("Helvetica", 12))
         ausname_label.grid(row=1, column=4, padx=20, pady=20)
 
-        # Start the application
         self.root.mainloop()
 
     def _create_button(self, text, color, command, column):
-        """Helper method to create a button."""
         button = tk.Button(self.root, text=text, bg=color, fg="white", font=("Helvetica", 12), command=command, padx=20, pady=10, relief="flat", bd=0)
         button.grid(row=0, column=column, padx=20, pady=20)
 
     def start_attendance(self):
-        """Handle start button click."""
         messagebox.showinfo("Info", "Start Attendance")
         threading.Thread(target=self.capture_and_process_frames, daemon=True).start()
 
     def zehn_minuten_pause_click(self):
-        """Handle 10-minute pause button click."""
         messagebox.showinfo("Info", "10 Minuten Pause-Button wurde geklickt")
-        self.pause_time = 600  # 10 minutes in seconds
+        self.pause_time = 50 # 10 minutes in seconds
         self.pause_event.set()
 
     def zwanzig_minuten_pause_click(self):
-        """Handle 20-minute pause button click."""
         messagebox.showinfo("Info", "20 Minuten Pause-Button wurde geklickt")
         self.pause_time = 1200  # 20 minutes in seconds
         self.pause_event.set()
 
     def ende_button_click(self):
-        """Handle end button click."""
         self.send_attendance_to_api()
         messagebox.showinfo("Info", "Ende-Button wurde geklickt")
         self.root.quit()
 
     def speak(self, message):
-        """Use TTS to speak a message."""
         speak = Dispatch("SAPI.SpVoice")
         speak.Speak(message)
 
     def process_frame(self, frame):
-        """Process a frame to detect faces and recognize them."""
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = self.facedetect.detectMultiScale(gray, 1.3, 5)
         attendance = []
@@ -123,11 +110,10 @@ class FaceRecognitionApp:
             cv2.rectangle(frame, (x, y-40), (x+w, y), (50, 50, 255), -1)
             cv2.putText(frame, str(output[0]), (x, y-15), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
             attendance = [str(output[0]), timestamp, "true"]
-            break  # Stop after the first detected face
+            break
         return frame, attendance
 
     def capture_and_process_frames(self):
-        """Capture frames from the camera and process them."""
         while True:
             if self.pause_event.is_set():
                 self._handle_pause()
@@ -162,39 +148,34 @@ class FaceRecognitionApp:
                     self.attendance_data.append(["Unknown", timestamp, "false"])
                 self.save_attendance()
                 self.camera_busy = False
-                self.capture_interval = random.uniform(10, 55)  # Random interval between 10 to 55 seconds
+                self.capture_interval = random.uniform(10, 55)
                 time.sleep(self.capture_interval)
 
     def _handle_pause(self):
-        """Handle pause event."""
         start_pause_time = time.time()
         self.record_pause_start(start_pause_time)
         time.sleep(self.pause_time)
         self.record_pause_end(start_pause_time + self.pause_time)
 
     def record_pause_start(self, start_time):
-        """Record the start of a pause."""
         date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "Start"]
         self.save_pause_record(pause_record, date)
 
     def record_pause_end(self, end_time):
-        """Record the end of a pause."""
         date = datetime.fromtimestamp(end_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(end_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "End"]
         self.save_pause_record(pause_record, date)
 
     def save_pause_record(self, record, date):
-        """Save a pause record to a CSV file."""
         if not os.path.exists("pause"):
             os.makedirs("pause")
         file_path = f"pause/Pause_{date}.csv"
         self._save_record(file_path, record, ["STATUS", "TIMESTAMP", "TYPE"])
 
     def save_attendance(self):
-        """Save the attendance record to a CSV file."""
         if self.attendance_data:
             record = self.attendance_data.pop(0)
             date = datetime.now().strftime("%d-%m-%Y")
@@ -204,7 +185,6 @@ class FaceRecognitionApp:
             self._save_record(file_path, record, COL_NAMES)
 
     def _save_record(self, file_path, record, headers):
-        """Helper method to save a record to a CSV file."""
         exist = os.path.isfile(file_path)
         with open(file_path, "a", newline='') as csvfile:
             writer = csv.writer(csvfile)
@@ -216,48 +196,61 @@ class FaceRecognitionApp:
         attendance_dir = 'Attendance'
         results = []
 
-        attendance_files = [f for f in os.listdir(attendance_dir) if f.startswith("Attendance_") and f.endswith(".csv")]
-        attendance_files.sort(key=lambda x: datetime.strptime(x.split("_")[1].split(".")[0], "%d-%m-%Y"), reverse=True)
+        for filename in sorted(os.listdir(attendance_dir)):
+            if filename.startswith("Attendance_") and filename.endswith(".csv"):
+                date_str = filename.split("_")[1].split(".")[0]
+                date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
 
-        for filename in attendance_files:
-            date_str = filename.split("_")[1].split(".")[0]
-            date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+                true_count = 0
+                false_count = 0
+                total_count = 0
+                name = None
 
-            true_count = 0
-            false_count = 0
-            total_count = 0
-            name = None  # Initialize name variable
+                with open(os.path.join(attendance_dir, filename), 'r') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    for row in reader:
+                        total_count += 1
+                        name = row['NAME']
+                        if row['STATUS'] == 'true':
+                            true_count += 1
+                        elif row['STATUS'] == 'false':
+                            false_count += 1
 
-            with open(os.path.join(attendance_dir, filename), 'r') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    total_count += 1
-                    name = row['NAME']  # Get the name from the row
-                    if row['STATUS'] == 'true':
-                        true_count += 1
-                    elif row['STATUS'] == 'false':
-                        false_count += 1
-
-            if total_count > 0:
-                try:
-                    true_percentage = Decimal(true_count) / Decimal(total_count) * Decimal(100)
-                    false_percentage = Decimal(false_count) / Decimal(total_count) * Decimal(100)
+                if total_count > 0:
+                    true_percentage = round(Decimal(true_count) / Decimal(total_count) * Decimal(100), 2)
+                    false_percentage = round(Decimal(false_count) / Decimal(total_count) * Decimal(100), 2)
 
                     results.append({
-                        'name': name,  # Add the name to the results
+                        'name': name,
                         'date': date,
-                        'true_percentage': str(round(true_percentage, 1)),  # Convert to string
-                        'false_percentage': str(round(false_percentage, 1))  # Convert to string
+                        'true_percentage': str(true_percentage),
+                        'false_percentage': str(false_percentage)
                     })
-                except InvalidOperation:
-                    print("InvalidOperation error occurred while calculating percentages.")
-                    continue
 
         return results
 
+    def analyze_pause(self):
+        pause_dir = 'pause'
+        pause_data = []
+
+        if os.path.exists(pause_dir):
+            latest_file = sorted(os.listdir(pause_dir))[-1]
+            date_str = latest_file.split("_")[1].split(".")[0]
+            date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+
+            with open(os.path.join(pause_dir, latest_file), 'r') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    pause_data.append({
+                        'status': row['STATUS'],
+                        'timestamp': row['TIMESTAMP'],
+                        'type': row['TYPE']
+                    })
+
+        return {'date': date, 'pause_data': pause_data}
+
     def send_to_api(self, data):
         try:
-            # Wrap the data in a JSON body as required by your API Gateway
             payload = {
                 "body": json.dumps(data)
             }
@@ -271,11 +264,16 @@ class FaceRecognitionApp:
 
     def send_attendance_to_api(self):
         attendance_data = self.analyze_attendance()
-        if attendance_data:
-            last_record = attendance_data[0]  # Get the latest record
-            self.send_to_api(last_record)  # Send only the latest record
+        pause_data = self.analyze_pause()
+        if attendance_data and pause_data:
+            last_attendance_record = attendance_data[-1]
+            combined_data = {
+                'attendance': last_attendance_record,
+                'pause': pause_data
+            }
+            self.send_to_api(combined_data)
             print("Data has been sent to API:")
-            print(json.dumps(last_record, indent=2, default=str))
+            print(json.dumps(combined_data, indent=2, default=str))
 
 if __name__ == "__main__":
     app = FaceRecognitionApp()
