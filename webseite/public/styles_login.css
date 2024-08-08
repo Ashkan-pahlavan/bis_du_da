@@ -1,0 +1,76 @@
+body {
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle farthest-corner at 10% 20%, rgba(90, 92, 106, 1) 0%, rgba(32, 45, 58, 1) 81.3%);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  text-align: center;
+}
+
+.login {
+  font-size: 0.8em;
+  box-shadow: 0px 2px 25px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 25px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 25px 35px;
+  color: white;
+  margin: 20px 130px;
+  width: 400px;
+}
+
+.login h2 {
+  color: #0fc3cc;
+}
+
+.login input[type="email"],
+.login input[type="password"],
+.login input[type="text"] {
+  width: calc(100% - 20px); /* تغییر پهنای کادرها */
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.login button {
+  background-color: #0fc3cc;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  width: calc(100% - 20px); /* تغییر پهنای دکمه */
+}
+
+.login button:hover {
+  background-color: gold;
+}
+
+.password-container {
+  position: relative;
+}
+
+.password-container img.toggle-password {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.password-container input {
+  padding-right: 40px;
+}

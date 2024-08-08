@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration and Login</title>
+    <link rel="stylesheet" href="styles_login.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="login.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="login">
+            <h2>Registration Form</h2>
+            <form id="registerForm">
+                <div class="label-container">
+                    <label for="registerEmail">Email:</label>
+                </div>
+                <input type="email" id="registerEmail" required>
+                <br>
+                <div class="label-container">
+                    <label for="registerPassword">Password:</label>
+                </div>
+                <div class="password-container">
+                    <input type="password" id="registerPassword" required>
+                    <img src="eye-icon.jpg" class="toggle-password" id="registerPasswordIcon" alt="Toggle Password Visibility">
+                </div>
+                <br>
+                <div class="label-container">
+                    <label for="confirmPassword">Confirm Password:</label>
+                </div>
+                <div class="password-container">
+                    <input type="password" id="confirmPassword" required>
+                    <img src="eye-icon.jpg" class="toggle-password" id="confirmPasswordIcon" alt="Toggle Password Visibility">
+                </div>
+                <br>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+        <div class="login">
+            <h2>Login Form</h2>
+            <form id="loginForm">
+                <div class="label-container">
+                    <label for="loginEmail">Email:</label>
+                </div>
+                <input type="email" id="loginEmail" required>
+                <br>
+                <div class="label-container">
+                    <label for="loginPassword">Password:</label>
+                </div>
+                <div class="password-container">
+                    <input type="password" id="loginPassword" required>
+                    <img src="eye-icon.jpg" class="toggle-password" id="loginPasswordIcon" alt="Toggle Password Visibility">
+                </div>
+                <br>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
