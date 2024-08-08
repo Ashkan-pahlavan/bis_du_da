@@ -1,11 +1,18 @@
 document.getElementById("updateButton").addEventListener("click", async function () {
   try {
+    // دریافت تاریخ امروز
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // ماه از 0 شروع می‌شود، بنابراین 1 را اضافه می‌کنیم
+    const dd = String(today.getDate()).padStart(2, '0');
+    const currentDate = `${yyyy}-${mm}-${dd}`; // فرمت YYYY-MM-DD
+
     const response = await fetch("https://y0vkz8x2w2.execute-api.eu-central-1.amazonaws.com/stage/attendance", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ date: "2024-08-07" })  // این تاریخ به طور مثال است، می‌توانید آن را تغییر دهید
+      body: JSON.stringify({ date: currentDate }) // استفاده از تاریخ امروز به جای تاریخ ثابت
     });
 
     if (!response.ok) {
@@ -14,7 +21,6 @@ document.getElementById("updateButton").addEventListener("click", async function
 
     const data = await response.json();
 
-    // بررسی کنید که data آرایه باشد
     if (!Array.isArray(data)) {
       console.error("Received data is not an array:", data);
       throw new Error("Data is not an array");
