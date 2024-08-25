@@ -13,9 +13,17 @@
         <label for="dateInput">Datum wählen:</label>
         <input type="date" id="dateInput" />
       </div>
-      <button id="updateButton" class="update-button">Daten Aktualisieren</button>
-      <button id="todayButton" class="today-button">Heute</button>
-      <button id="yesterdayButton" class="yesterday-button">Gestern</button>
+      <div class="button-container">
+        <div class="left-buttons">
+          <button id="updateButton" class="update-button">Daten Aktualisieren</button>
+          <button id="todayButton" class="today-button">Heute</button>
+          <button id="yesterdayButton" class="yesterday-button">Gestern</button>
+        </div>
+        <div class="right-buttons">
+          <button id="pauseButton" class="pause-button">Pause</button>
+          <button id="pauseCheckButton" class="pause-check-button">Pause Check</button>
+        </div>
+      </div>      
       <table id="attendance-table">
         <thead>
           <tr>

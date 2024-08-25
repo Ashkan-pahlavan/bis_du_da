@@ -100,3 +100,39 @@ button.yesterday-button {
 button.yesterday-button:hover {
   background-color: #e65100;
 }
+
+/* New CSS for Pause and Pause Check buttons */
+button.pause-button {
+  background-color: #17a2b8;
+  margin-left: 10px;
+}
+
+button.pause-button:hover {
+  background-color: #117a8b;
+}
+
+button.pause-check-button {
+  background-color: #28a745;
+  margin-left: 10px;
+}
+
+button.pause-check-button:hover {
+  background-color: #218838;
+}
+
+/* Flexbox for buttons alignment */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.left-buttons {
+  display: flex;
+}
+
+.right-buttons {
+  display: flex;
+  margin-left: auto;
+}

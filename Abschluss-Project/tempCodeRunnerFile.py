@@ -1,1 +1,1 @@
-data
+y:y+h, x:x+w]
