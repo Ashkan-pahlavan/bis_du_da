@@ -8,9 +8,11 @@
 2. [Funktionen](#funktionen)
 3. [Installation](#installation)
 4. [Verwendung](#verwendung)
-5. [Technologien](#technologien)
-6. [Beitragende](#beitragende)
-7. [Lizenz](#lizenz)
+5. [Webseiten-Integration](#webseiten-integration)
+6. [Login- und Registrierungssystem](#login--und-registrierungssystem)
+7. [Technologien](#technologien)
+8. [Beitragende](#beitragende)
+9. [Lizenz](#lizenz)
 
 ## Über das Projekt
 
@@ -35,6 +37,7 @@ Das Projekt "Bist du da?" ermöglicht es, die Anwesenheit von Personen in Echtze
 - NumPy
 - Requests
 - win32com.client (Für Text-to-Speech, auf Windows)
+- Flask (optional, für API-Tests)
 
 ### Installationsschritte
 
@@ -67,7 +70,9 @@ opencv-python
 scikit-learn
 numpy
 requests
+flask  # Optional, für API-Tests
 pywin32  # Nur für Windows (win32com.client)
+boto3  # Für AWS DynamoDB Interaktion
 ```
 
 ## Verwendung
@@ -90,11 +95,59 @@ pywin32  # Nur für Windows (win32com.client)
 
 Die Anwesenheitsdaten können am Ende der Erfassung an eine externe API gesendet werden. Dies erfolgt automatisch, wenn die Schaltfläche "Ende" gedrückt wird.
 
+## Webseiten-Integration
+
+Das Projekt enthält auch eine Webseite, die Daten von der DynamoDB-Datenbank über eine API abruft und die Anwesenheits- sowie Pausenzeiten in einer übersichtlichen Tabelle darstellt.
+
+### Funktionen der Webseite:
+
+- **Anwesenheitsanzeige**: Zeigt die Anwesenheitsdaten von Benutzern für einen bestimmten Tag an.
+- **Pause-Überprüfung**: Vergleicht die Pausenzeiten der Benutzer mit einer gespeicherten Zeit und markiert Abweichungen.
+- **Datenaktualisierung**: Ermöglicht das Abrufen und Anzeigen von aktuellen Anwesenheitsdaten.
+
+### Verwendung:
+
+1. Die Webseite ruft die Anwesenheitsdaten und Pausenzeiten von einer AWS-Lambda-Funktion ab, die in der DynamoDB gespeicherte Daten bereitstellt.
+2. Die Benutzeroberfläche zeigt diese Daten an und bietet zusätzliche Interaktionen wie das Überprüfen der Pause (mit visuellem Hinweis bei Abweichungen).
+
+### Start der Webseite:
+
+Die Webseite befindet sich im Ordner `webseite`. Öffne einfach die `index.html`-Datei in einem Browser, um die Anwendung zu starten. 
+
+## Login- und Registrierungssystem
+
+Das System unterstützt ein sicheres Login- und Registrierungssystem, bei dem nur autorisierte Benutzer Zugriff haben.
+
+### Funktionen:
+
+- **Benutzerregistrierung**: Nur vorab autorisierte E-Mail-Adressen (z. B. Lehrer) können sich registrieren.
+- **Passwort-Hashing**: Passwörter werden sicher mit SHA-256 gehasht und in der DynamoDB gespeichert.
+- **Login**: Benutzer können sich mit ihrer E-Mail und ihrem Passwort anmelden.
+
+### Implementierung:
+
+- **DynamoDB**: Speichert Benutzerinformationen wie E-Mail und gehashtes Passwort.
+- **AWS Lambda**: Handhabt die Registrierung und das Login durch Verarbeiten von HTTP-Anfragen und Interaktion mit DynamoDB.
+- **API Gateway**: Dient als Schnittstelle zwischen dem Frontend (Webseite) und der AWS Lambda-Funktion.
+
+### Code Beispiele:
+
+- **Registrierung**:
+   ```python
+   # Boto3 Code zur Speicherung von Benutzerdaten in DynamoDB
+   ```
+
+- **Login**:
+   ```python
+   # Boto3 Code zur Authentifizierung eines Benutzers mit DynamoDB
+   ```
+
 ## Technologien
 
-- **Programmiersprache**: Python
-- **Bibliotheken**: OpenCV, Tkinter, Scikit-Learn, Requests, NumPy
-- **API**: RESTful API für die Datenübertragung
+- **Programmiersprache**: Python, HTML, CSS, JavaScript
+- **Bibliotheken**: OpenCV, Tkinter, Scikit-Learn, Requests, NumPy, Boto3
+- **API**: RESTful API mit AWS Lambda und API Gateway
+- **Datenbank**: AWS DynamoDB
 
 ## Beitragende
 
@@ -105,4 +158,4 @@ Die Anwesenheitsdaten können am Ende der Erfassung an eine externe API gesendet
 Dieses Projekt ist unter der MIT-Lizenz lizenziert – siehe die [LICENSE](LICENSE)-Datei für Details.
 ```
 
-This should render properly on GitHub or any markdown viewer, maintaining the correct structure for headings, code blocks, and lists.
+You can copy this content directly into your README.md file. It now includes detailed information about the login and website functionalities integrated into the project, with sections dedicated to the API interactions, AWS Lambda, and DynamoDB for managing users and attendance data.
