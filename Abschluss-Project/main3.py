@@ -80,12 +80,12 @@ class FaceRecognitionApp:
 
     def zehn_minuten_pause_click(self):
         messagebox.showinfo("Info", "10 Minuten Pause-Button wurde geklickt")
-        self.pause_time = 50 # 10 minutes in seconds
+        self.pause_time = 10 # 10 seconds for testing
         self.pause_event.set()
 
     def zwanzig_minuten_pause_click(self):
         messagebox.showinfo("Info", "20 Minuten Pause-Button wurde geklickt")
-        self.pause_time = 1200  # 20 minutes in seconds
+        self.pause_time = 20  # 20 seconds for testing
         self.pause_event.set()
 
     def ende_button_click(self):
@@ -161,13 +161,19 @@ class FaceRecognitionApp:
         date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "Start"]
-        self.save_pause_record(pause_record, date, "pause")
+        if self.pause_time == 10:
+            self.save_pause_record(pause_record, date, "pause")
+        elif self.pause_time == 20:
+            self.save_pause_record(pause_record, date, "pause2")
 
     def record_pause_end(self, end_time):
         date = datetime.fromtimestamp(end_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(end_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "End"]
-        self.save_pause_record(pause_record, date, "pause")
+        if self.pause_time == 10:
+            self.save_pause_record(pause_record, date, "pause")
+        elif self.pause_time == 20:
+            self.save_pause_record(pause_record, date, "pause2")
 
     def save_pause_record(self, record, date, folder_name):
         if not os.path.exists(folder_name):
@@ -229,6 +235,7 @@ class FaceRecognitionApp:
 
         return results
 
+
     def analyze_pause(self, pause_dir='pause'):
         pause_data = []
 
@@ -264,14 +271,14 @@ class FaceRecognitionApp:
     def send_attendance_to_api(self):
         attendance_data = self.analyze_attendance()
         pause_data = self.analyze_pause()
-        pause_20_data = self.analyze_pause(pause_dir='pause2')  # آنالیز وقفه 20 دقیقه‌ای
+        pause_20_data = self.analyze_pause(pause_dir='pause2')  # Analyze 20-minute pause data
 
         if attendance_data and pause_data:
             last_attendance_record = attendance_data[-1]
             combined_data = {
                 'attendance': last_attendance_record,
                 'pause': pause_data,
-                'pause_20_data': pause_20_data['pause_data']  # افزودن داده‌های pause2
+                'pause_20_data': pause_20_data['pause_data']  # Include 20-minute pause data
             }
             self.send_to_api(combined_data)
             print("Data has been sent to API:")
