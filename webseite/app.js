@@ -1,14 +1,13 @@
-// document.getElementById("pauseButton").addEventListener("click", function () {
-//   const now = new Date();
-//   const localTime = now.toLocaleString(); // ذخیره زمان محلی کاربر
-//   localStorage.setItem("pauseTime", localTime);
-//   alert("Pause time has been saved.");
-// });
-
-document.getElementById("pauseButton").addEventListener("click", function () {
+document.getElementById("pause10Button").addEventListener("click", function () {
   const now = new Date();
-  localStorage.setItem("pauseTime", now.toISOString());
-  alert("Pause time has been saved.");
+  localStorage.setItem("pause10Time", now.toISOString());
+  alert("10-minute Pause time has been saved.");
+});
+
+document.getElementById("pause20Button").addEventListener("click", function () {
+  const now = new Date();
+  localStorage.setItem("pause20Time", now.toISOString());
+  alert("20-minute Pause time has been saved.");
 });
 
 document
@@ -19,7 +18,7 @@ document
       let selectedDate;
 
       if (dateInput) {
-        selectedDate = dateInput; // استفاده از تاریخ وارد شده توسط معلم
+        selectedDate = dateInput;
       } else {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -53,55 +52,29 @@ document
       const tableBody = document.querySelector("#attendance-table tbody");
       tableBody.innerHTML = "";
 
-      const storedPauseTime = localStorage.getItem("pauseTime");
-      const storedPauseDate = storedPauseTime
-        ? new Date(storedPauseTime)
-        : null;
-
       data.forEach((item) => {
         const row = document.createElement("tr");
 
-        const truePercentage = parseFloat(item.true_percentage);
-        const pauseStart = new Date(item.pause_start);
+        const truePercentage = parseFloat(item.true_percentage) || 0;
+        const falsePercentage = parseFloat(item.false_percentage) || 0;
+        const pause10Start = item.pause_start || "N/A"; // Name corrected
+        const pause10End = item.pause_end || "N/A"; // Name corrected
+        const pause20Start = item.pause_20_start || "N/A";
+        const pause20End = item.pause_20_end || "N/A";
 
-        // شرط برای تغییر رنگ ردیف اگر درصد حضور کمتر از 80 باشد
+        row.innerHTML = `
+              <td>${item.name || "N/A"}</td>
+              <td>${item.date || "N/A"}</td>
+              <td>${truePercentage}</td>
+              <td>${falsePercentage}</td>
+              <td>${pause10Start}</td>
+              <td>${pause10End}</td>
+              <td>${pause20Start}</td>
+              <td>${pause20End}</td>
+          `;
         if (truePercentage < 80) {
           row.style.backgroundColor = "red";
         }
-
-        // شرط برای تغییر رنگ زمان شروع پاز اگر تفاوت بیشتر از 3 دقیقه باشد
-        if (storedPauseDate) {
-          const timeDifference = Math.abs(pauseStart - storedPauseDate) / 60000; // اختلاف زمانی به دقیقه
-          if (timeDifference > 3) {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td style="background-color: yellow;">${item.pause_start}</td>
-            <td>${item.pause_end}</td>
-          `;
-          } else {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td>${item.pause_start}</td>
-            <td>${item.pause_end}</td>
-          `;
-          }
-        } else {
-          row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.date}</td>
-          <td>${item.true_percentage}</td>
-          <td>${item.false_percentage}</td>
-          <td>${item.pause_start}</td>
-          <td>${item.pause_end}</td>
-        `;
-        }
-
         tableBody.appendChild(row);
       });
 
@@ -146,53 +119,41 @@ document
       const tableBody = document.querySelector("#attendance-table tbody");
       tableBody.innerHTML = "";
 
-      const storedPauseTime = localStorage.getItem("pauseTime");
-      const storedPauseDate = storedPauseTime
-        ? new Date(storedPauseTime)
+      const storedPause10Time = localStorage.getItem("pause10Time");
+      const storedPause20Time = localStorage.getItem("pause20Time");
+      const storedPause10Date = storedPause10Time
+        ? new Date(storedPause10Time)
+        : null;
+      const storedPause20Date = storedPause20Time
+        ? new Date(storedPause20Time)
         : null;
 
       data.forEach((item) => {
         const row = document.createElement("tr");
 
         const truePercentage = parseFloat(item.true_percentage);
-        const pauseStart = new Date(item.pause_start);
+        const pause10Start = item.pause_start || "N/A";
+        const pause10End = item.pause_end || "N/A";
+        const pause20Start = item.pause_20_start || "N/A";
+        const pause20End = item.pause_20_end || "N/A";
 
         if (truePercentage < 80) {
           row.style.backgroundColor = "red";
         }
 
-        if (storedPauseDate) {
-          const timeDifference = Math.abs(pauseStart - storedPauseDate) / 60000;
-          if (timeDifference > 3) {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td style="background-color: yellow;">${item.pause_start}</td>
-            <td>${item.pause_end}</td>
+        row.innerHTML = `
+              <td>${item.name}</td>
+              <td>${item.date}</td>
+              <td>${item.true_percentage}</td>
+              <td>${item.false_percentage}</td>
+              <td>${pause10Start}</td>
+              <td>${pause10End}</td>
+              <td>${pause20Start}</td>
+              <td>${pause20End}</td>
           `;
-          } else {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td>${item.pause_start}</td>
-            <td>${item.pause_end}</td>
-          `;
-          }
-        } else {
-          row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.date}</td>
-          <td>${item.true_percentage}</td>
-          <td>${item.false_percentage}</td>
-          <td>${item.pause_start}</td>
-          <td>${item.pause_end}</td>
-        `;
+        if (truePercentage < 80) {
+          row.style.backgroundColor = "red";
         }
-
         tableBody.appendChild(row);
       });
 
@@ -238,53 +199,41 @@ document
       const tableBody = document.querySelector("#attendance-table tbody");
       tableBody.innerHTML = "";
 
-      const storedPauseTime = localStorage.getItem("pauseTime");
-      const storedPauseDate = storedPauseTime
-        ? new Date(storedPauseTime)
+      const storedPause10Time = localStorage.getItem("pause10Time");
+      const storedPause20Time = localStorage.getItem("pause20Time");
+      const storedPause10Date = storedPause10Time
+        ? new Date(storedPause10Time)
+        : null;
+      const storedPause20Date = storedPause20Time
+        ? new Date(storedPause20Time)
         : null;
 
       data.forEach((item) => {
         const row = document.createElement("tr");
 
         const truePercentage = parseFloat(item.true_percentage);
-        const pauseStart = new Date(item.pause_start);
+        const pause10Start = item.pause_start || "N/A";
+        const pause10End = item.pause_end || "N/A";
+        const pause20Start = item.pause_20_start || "N/A";
+        const pause20End = item.pause_20_end || "N/A";
 
         if (truePercentage < 80) {
           row.style.backgroundColor = "red";
         }
 
-        if (storedPauseDate) {
-          const timeDifference = Math.abs(pauseStart - storedPauseDate) / 60000;
-          if (timeDifference > 3) {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td style="background-color: yellow;">${item.pause_start}</td>
-            <td>${item.pause_end}</td>
+        row.innerHTML = `
+              <td>${item.name}</td>
+              <td>${item.date}</td>
+              <td>${item.true_percentage}</td>
+              <td>${item.false_percentage}</td>
+              <td>${pause10Start}</td>
+              <td>${pause10End}</td>
+              <td>${pause20Start}</td>
+              <td>${pause20End}</td>
           `;
-          } else {
-            row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.date}</td>
-            <td>${item.true_percentage}</td>
-            <td>${item.false_percentage}</td>
-            <td>${item.pause_start}</td>
-            <td>${item.pause_end}</td>
-          `;
-          }
-        } else {
-          row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.date}</td>
-          <td>${item.true_percentage}</td>
-          <td>${item.false_percentage}</td>
-          <td>${item.pause_start}</td>
-          <td>${item.pause_end}</td>
-        `;
+        if (truePercentage < 80) {
+          row.style.backgroundColor = "red";
         }
-
         tableBody.appendChild(row);
       });
 
@@ -294,36 +243,69 @@ document
     }
   });
 
-  document.getElementById("pauseCheckButton").addEventListener("click", function () {
-    const storedPauseTime = localStorage.getItem("pauseTime");
+document
+  .getElementById("pauseCheckButton")
+  .addEventListener("click", function () {
+    const storedPause10Time = localStorage.getItem("pause10Time");
+    const storedPause20Time = localStorage.getItem("pause20Time");
 
-    if (!storedPauseTime) {
-        alert("No pause time found in local storage.");
-        return;
+    if (!storedPause10Time && !storedPause20Time) {
+      alert("No pause times found in local storage.");
+      return;
     }
-
-    // Convert stored time to local time
-    const storedPauseDateUTC = new Date(storedPauseTime);
-    const storedPauseDateLocal = new Date(storedPauseDateUTC);
 
     const rows = document.querySelectorAll("#attendance-table tbody tr");
 
     rows.forEach((row, index) => {
-        const pauseStartCell = row.querySelector("td:nth-child(5)");
-        const pauseStartTime = pauseStartCell.textContent;
+      const pause10StartCell = row.querySelector("td:nth-child(5)");
+      const pause20StartCell = row.querySelector("td:nth-child(7)");
 
-        // Parse Pause Start Time from table (HH:MM:SS) and combine with the stored date
-        const [hours, minutes, seconds] = pauseStartTime.split(":");
-        const pauseDate = new Date(storedPauseDateLocal);
-        pauseDate.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds), 0);
+      const pause10StartTime = pause10StartCell.textContent;
+      const pause20StartTime = pause20StartCell.textContent;
 
-        const timeDifference = Math.abs((pauseDate - storedPauseDateLocal) / (1000 * 60)); // تفاوت زمانی به دقیقه
+      const storedPause10Date = new Date(storedPause10Time);
+      const storedPause20Date = new Date(storedPause20Time);
+
+      if (pause10StartTime !== "N/A") {
+        const [hours, minutes, seconds] = pause10StartTime.split(":");
+        const pause10Date = new Date(storedPause10Date);
+        pause10Date.setHours(
+          parseInt(hours),
+          parseInt(minutes),
+          parseInt(seconds),
+          0
+        );
+
+        const timeDifference = Math.abs(
+          (pause10Date - storedPause10Date) / (1000 * 60)
+        );
 
         if (timeDifference > 3) {
-            pauseStartCell.style.color = "yellow"; // تغییر رنگ نوشته به زرد
+          pause10StartCell.style.color = "yellow";
         } else {
-            pauseStartCell.style.color = ""; // بازگرداندن رنگ به حالت عادی
+          pause10StartCell.style.color = "";
         }
-    });
-});
+      }
 
+      if (pause20StartTime !== "N/A") {
+        const [hours, minutes, seconds] = pause20StartTime.split(":");
+        const pause20Date = new Date(storedPause20Date);
+        pause20Date.setHours(
+          parseInt(hours),
+          parseInt(minutes),
+          parseInt(seconds),
+          0
+        );
+
+        const timeDifference = Math.abs(
+          (pause20Date - storedPause20Date) / (1000 * 60)
+        );
+
+        if (timeDifference > 3) {
+          pause20StartCell.style.color = "yellow";
+        } else {
+          pause20StartCell.style.color = "";
+        }
+      }
+    });
+  });

@@ -31,8 +31,8 @@ body {
 .login input[type="email"],
 .login input[type="password"],
 .login input[type="text"] {
-  width: calc(100% - 20px); /* تغییر پهنای کادرها */
-  padding: 12px;
+  width: 100%; /* Ensures the input takes full width */
+  padding: 12px 40px 12px 10px; /* Adds padding for the eye icon */
   margin: 8px 0;
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -50,7 +50,7 @@ body {
   font-weight: bold;
   transition: background-color 0.3s ease;
   text-decoration: none;
-  width: calc(100% - 20px); /* تغییر پهنای دکمه */
+  width: 100%;
 }
 
 .login button:hover {
@@ -59,6 +59,7 @@ body {
 
 .password-container {
   position: relative;
+  width: 100%;
 }
 
 .password-container img.toggle-password {
@@ -72,5 +73,25 @@ body {
 }
 
 .password-container input {
-  padding-right: 40px;
+  width: 100%;
+  padding-right: 40px; /* Add padding to the right to accommodate the icon */
+}
+
+.login a.toggle-link {
+  color: #0fc3cc;
+  text-decoration: none;
+  font-size: 0.8em;
+}
+
+.login a.toggle-link:hover {
+  text-decoration: underline;
+}
+.login a {
+  color: #0fc3cc; /* رنگ لینک */
+  text-decoration: none; /* حذف زیرخط لینک */
+  font-weight: bold;
+}
+
+.login a:hover {
+  text-decoration: underline; /* نمایش زیرخط در هنگام هاور کردن */
 }

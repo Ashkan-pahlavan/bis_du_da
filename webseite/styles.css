@@ -136,3 +136,19 @@ button.pause-check-button:hover {
   display: flex;
   margin-left: auto;
 }
+button.pause10-button {
+  background-color: #17a2b8;
+  margin-left: 10px;
+}
+
+button.pause20-button {
+  background-color: #f39c12;
+  margin-left: 10px;
+}
+
+button.pause-button:hover,
+button.pause-check-button:hover,
+button.pause10-button:hover,
+button.pause20-button:hover {
+  background-color: #117a8b;
+}

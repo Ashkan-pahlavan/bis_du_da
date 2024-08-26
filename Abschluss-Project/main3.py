@@ -161,18 +161,18 @@ class FaceRecognitionApp:
         date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "Start"]
-        self.save_pause_record(pause_record, date)
+        self.save_pause_record(pause_record, date, "pause")
 
     def record_pause_end(self, end_time):
         date = datetime.fromtimestamp(end_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(end_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "End"]
-        self.save_pause_record(pause_record, date)
+        self.save_pause_record(pause_record, date, "pause")
 
-    def save_pause_record(self, record, date):
-        if not os.path.exists("pause"):
-            os.makedirs("pause")
-        file_path = f"pause/Pause_{date}.csv"
+    def save_pause_record(self, record, date, folder_name):
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+        file_path = f"{folder_name}/Pause_{date}.csv"
         self._save_record(file_path, record, ["STATUS", "TIMESTAMP", "TYPE"])
 
     def save_attendance(self):
@@ -229,8 +229,7 @@ class FaceRecognitionApp:
 
         return results
 
-    def analyze_pause(self):
-        pause_dir = 'pause'
+    def analyze_pause(self, pause_dir='pause'):
         pause_data = []
 
         if os.path.exists(pause_dir):
@@ -265,11 +264,14 @@ class FaceRecognitionApp:
     def send_attendance_to_api(self):
         attendance_data = self.analyze_attendance()
         pause_data = self.analyze_pause()
+        pause_20_data = self.analyze_pause(pause_dir='pause2')  # آنالیز وقفه 20 دقیقه‌ای
+
         if attendance_data and pause_data:
             last_attendance_record = attendance_data[-1]
             combined_data = {
                 'attendance': last_attendance_record,
-                'pause': pause_data
+                'pause': pause_data,
+                'pause_20_data': pause_20_data['pause_data']  # افزودن داده‌های pause2
             }
             self.send_to_api(combined_data)
             print("Data has been sent to API:")

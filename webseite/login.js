@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ body: JSON.stringify(data) }),
       });
 
       const result = await response.json();
@@ -55,10 +55,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const result = await sendRequest(
-          "https://1pnb7lz9ql.execute-api.eu-central-1.amazonaws.com/prod/st/register",
+          "https://el5t5k2kq0.execute-api.eu-central-1.amazonaws.com/st/register",
           { email, password }
         );
-        alert(result.message);
+
+        if (
+          result.body === '{"message": "Login successful!", "success": true}'
+        ) {
+          // بررسی موفقیت لاگین
+          window.location.href = "index-tabelle.html";
+          alert(result.message || "Register successful!");
+        } else {
+          alert(result.message || "Login failed");
+        }
       } catch (error) {
         // خطا قبلاً لاگ شده است
       }
@@ -74,20 +83,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const result = await sendRequest(
-          "https://1pnb7lz9ql.execute-api.eu-central-1.amazonaws.com/prod/st/login",
+          "https://el5t5k2kq0.execute-api.eu-central-1.amazonaws.com/st/login",
           { email, password }
         );
 
-        if (result.success) {
-          window.location.href = "index-tabelle.html";
+        if (
+          result.body === '{"message": "Login successful!", "success": true}'
+        ) {
+          // بررسی موفقیت لاگین
+          window.location.href = "index-tabelle.html"; // انتقال به صفحه‌ی index-tabelle.html
+          alert(result.message || "Login successful!");
         } else {
-          alert(result.message);
+          alert(result.message || "Login failed");
         }
       } catch (error) {
-        // خطا قبلاً لاگ شده است
+        alert("Login failed");
+        console.error("Error:", error);
       }
     });
 
+  // مدیریت کلیک روی "Hier klicken" برای نمایش فرم ثبت‌نام
   document
     .getElementById("registerPasswordIcon")
     .addEventListener("click", function () {
@@ -104,5 +119,22 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("loginPasswordIcon")
     .addEventListener("click", function () {
       togglePassword("loginPassword");
+    });
+
+  // Toggle forms visibility
+  document
+    .getElementById("showRegisterForm")
+    .addEventListener("click", function (event) {
+      event.preventDefault();
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("registerContainer").style.display = "block";
+    });
+
+  document
+    .getElementById("showLoginForm")
+    .addEventListener("click", function (event) {
+      event.preventDefault();
+      document.getElementById("registerContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
     });
 });
