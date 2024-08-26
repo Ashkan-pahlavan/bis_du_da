@@ -281,7 +281,7 @@ document
         );
 
         if (timeDifference > 3) {
-          pause10StartCell.style.color = "yellow";
+          pause10StartCell.style.color = "yellow";j
         } else {
           pause10StartCell.style.color = "";
         }
