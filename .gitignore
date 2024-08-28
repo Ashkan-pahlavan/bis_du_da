@@ -176,3 +176,18 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python
 
 .vscode
+
+# Ignore the Attendance, pause, and Pause2 folders
+Attendance/
+pause/
+Pause2/
+
+# Other files and folders to ignore (optional)
+*.pyc
+__pycache__/
+*.log
+
+
+# Ignore specific files in the data folder
+data/faces_data.pkl
+data/names.pkl

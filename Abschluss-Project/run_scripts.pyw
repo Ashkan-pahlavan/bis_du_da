@@ -3,11 +3,12 @@ import subprocess
 
 def run_main3():
     # Full path to main3.py
-    subprocess.run(['python', r"C:/Users/Ashkan_pahlavan/Documents/Abschluss-project/Abschluss-Project/main3.py"])
+    subprocess.Popen(['python', r"C:/Users/Ashkan_pahlavan/Documents/Abschluss-project/Abschluss-Project/main3.py"], creationflags=subprocess.CREATE_NO_WINDOW)
+
 
 def run_main4():
     # Full path to main4.py
-    subprocess.run(['python', r'C:/Users/Ashkan_pahlavan/Documents/Abschluss-project/Abschluss-Project/main4.py'])
+    subprocess.run(['python', r'C:/Users/Ashkan_pahlavan/Documents/Abschluss-project/Abschluss-Project/main4.py'], creationflags=subprocess.CREATE_NO_WINDOW)
 
 # Initialize the main window
 root = tk.Tk()

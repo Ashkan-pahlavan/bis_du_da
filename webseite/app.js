@@ -243,69 +243,66 @@ document
     }
   });
 
-document
-  .getElementById("pauseCheckButton")
-  .addEventListener("click", function () {
+  document.getElementById("pauseCheckButton").addEventListener("click", function () {
     const storedPause10Time = localStorage.getItem("pause10Time");
     const storedPause20Time = localStorage.getItem("pause20Time");
 
     if (!storedPause10Time && !storedPause20Time) {
-      alert("No pause times found in local storage.");
-      return;
+        alert("Keine Pausenzeit im lokalen Speicher gefunden.");
+        return;
     }
 
     const rows = document.querySelectorAll("#attendance-table tbody tr");
 
     rows.forEach((row, index) => {
-      const pause10StartCell = row.querySelector("td:nth-child(5)");
-      const pause20StartCell = row.querySelector("td:nth-child(7)");
+        const pause10StartCell = row.querySelector("td:nth-child(5)");
+        const pause20StartCell = row.querySelector("td:nth-child(7)");
 
-      const pause10StartTime = pause10StartCell.textContent;
-      const pause20StartTime = pause20StartCell.textContent;
+        const pause10StartTime = pause10StartCell.textContent;
+        const pause20StartTime = pause20StartCell.textContent;
 
-      const storedPause10Date = new Date(storedPause10Time);
-      const storedPause20Date = new Date(storedPause20Time);
+        if (storedPause10Time && pause10StartTime !== "N/A") {
+            const storedPause10Date = new Date(storedPause10Time);
+            const [hours10, minutes10, seconds10] = pause10StartTime.split(":");
+            const pause10Date = new Date(storedPause10Date);
+            pause10Date.setHours(
+                parseInt(hours10),
+                parseInt(minutes10),
+                parseInt(seconds10),
+                0
+            );
 
-      if (pause10StartTime !== "N/A") {
-        const [hours, minutes, seconds] = pause10StartTime.split(":");
-        const pause10Date = new Date(storedPause10Date);
-        pause10Date.setHours(
-          parseInt(hours),
-          parseInt(minutes),
-          parseInt(seconds),
-          0
-        );
+            const timeDifference10 = Math.abs(
+                (pause10Date.getTime() - storedPause10Date.getTime()) / (1000 * 60)
+            );
 
-        const timeDifference = Math.abs(
-          (pause10Date - storedPause10Date) / (1000 * 60)
-        );
-
-        if (timeDifference > 3) {
-          pause10StartCell.style.color = "yellow";j
-        } else {
-          pause10StartCell.style.color = "";
+            if (timeDifference10 > 3) {
+                pause10StartCell.style.color = "yellow";
+            } else {
+                pause10StartCell.style.color = "";
+            }
         }
-      }
 
-      if (pause20StartTime !== "N/A") {
-        const [hours, minutes, seconds] = pause20StartTime.split(":");
-        const pause20Date = new Date(storedPause20Date);
-        pause20Date.setHours(
-          parseInt(hours),
-          parseInt(minutes),
-          parseInt(seconds),
-          0
-        );
+        if (storedPause20Time && pause20StartTime !== "N/A") {
+            const storedPause20Date = new Date(storedPause20Time);
+            const [hours20, minutes20, seconds20] = pause20StartTime.split(":");
+            const pause20Date = new Date(storedPause20Date);
+            pause20Date.setHours(
+                parseInt(hours20),
+                parseInt(minutes20),
+                parseInt(seconds20),
+                0
+            );
 
-        const timeDifference = Math.abs(
-          (pause20Date - storedPause20Date) / (1000 * 60)
-        );
+            const timeDifference20 = Math.abs(
+                (pause20Date.getTime() - storedPause20Date.getTime()) / (1000 * 60)
+            );
 
-        if (timeDifference > 3) {
-          pause20StartCell.style.color = "yellow";
-        } else {
-          pause20StartCell.style.color = "";
+            if (timeDifference20 > 3) {
+                pause20StartCell.style.color = "yellow";
+            } else {
+                pause20StartCell.style.color = "";
+            }
         }
-      }
     });
-  });
+});
