@@ -204,8 +204,14 @@ class FaceRecognitionApp:
 
         for filename in sorted(os.listdir(attendance_dir)):
             if filename.startswith("Attendance_") and filename.endswith(".csv"):
-                date_str = filename.split("_")[1].split(".")[0]
-                date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+                try:
+                    date_str = filename.split("_")[1].split(".")[0]
+                    # Überprüfen, ob das Datum im richtigen Format vorliegt
+                    date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+                except ValueError:
+                    # Wenn das Datum nicht konvertiert werden kann, überspringe diese Datei
+                    print(f"Skipping file due to incorrect date format: {filename}")
+                    continue
 
                 true_count = 0
                 false_count = 0
@@ -234,6 +240,7 @@ class FaceRecognitionApp:
                     })
 
         return results
+
 
 
     def analyze_pause(self, pause_dir='pause'):
