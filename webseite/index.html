@@ -1,64 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Registration</title>
-    <link rel="stylesheet" href="styles_login.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-    <script src="login.js" defer></script>
-</head>
-<body>
-    <div class="container">
-        <div id="loginContainer" class="login">
-            <h2>Login Form</h2>
-            <form id="loginForm">
-                <div class="label-container">
-                    <label for="loginEmail">Email:</label>
-                </div>
-                <input type="email" id="loginEmail" required>
-                <br>
-                <div class="label-container">
-                    <label for="loginPassword">Password:</label>
-                </div>
-                <div class="password-container">
-                    <input type="password" id="loginPassword" required>
-                    <img src="eye-icon.jpg" class="toggle-password" id="loginPasswordIcon" alt="Toggle Password Visibility">
-                </div>
-                <br>
-                <button type="submit">Login</button>
-            </form>
-            <p id="toggleRegister">Noch nicht registriert? <a href="#" id="showRegisterForm">Hier klicken</a></p>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anwesenheitsliste</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Anwesenheitsliste</h1>
+    <div id="app">
+      <div class="date-container">
+        <label for="dateInput">Datum wählen:</label>
+        <input type="date" id="dateInput" />
+      </div>
+      <div class="button-container">
+        <div class="left-buttons">
+          <button id="updateButton" class="update-button">Daten Aktualisieren</button>
+          <button id="todayButton" class="today-button">Heute</button>
+          <button id="yesterdayButton" class="yesterday-button">Gestern</button>
         </div>
-
-        <div id="registerContainer" class="login" style="display: none;">
-            <h2>Registration Form</h2>
-            <form id="registerForm">
-                <div class="label-container">
-                    <label for="registerEmail">Email:</label>
-                </div>
-                <input type="email" id="registerEmail" required>
-                <br>
-                <div class="label-container">
-                    <label for="registerPassword">Password:</label>
-                </div>
-                <div class="password-container">
-                    <input type="password" id="registerPassword" required>
-                    <img src="eye-icon.jpg" class="toggle-password" id="registerPasswordIcon" alt="Toggle Password Visibility">
-                </div>
-                <br>
-                <div class="label-container">
-                    <label for="confirmPassword">Confirm Password:</label>
-                </div>
-                <div class="password-container">
-                    <input type="password" id="confirmPassword" required>
-                    <img src="eye-icon.jpg" class="toggle-password" id="confirmPasswordIcon" alt="Toggle Password Visibility">
-                </div>
-                <br>
-                <button type="submit">Register</button>
-            </form>
-            <p id="toggleLogin">Bereits registriert? <a href="#" id="showLoginForm">Hier klicken</a></p>
+        <div class="right-buttons">
+          <button id="pause10Button" class="pause-button">Pause 10</button>
+          <button id="pause20Button" class="pause-button">Pause 20</button>
+          <button id="pauseCheckButton" class="pause-check-button">Pause Check</button>
         </div>
+      </div>      
+      <table id="attendance-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Datum</th>
+            <th>Anwesenheits-Prozentsatz</th>
+            <th>Abwesenheits-Prozentsatz</th>
+            <th>Pause 10 Start</th>
+            <th>Pause 10 Ende</th>
+            <th>Pause 20 Start</th>
+            <th>Pause 20 Ende</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be added here by JavaScript -->
+        </tbody>
+      </table>
     </div>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
