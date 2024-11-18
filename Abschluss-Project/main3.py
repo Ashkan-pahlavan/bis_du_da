@@ -16,7 +16,7 @@ import json
 from decimal import Decimal
 
 # Constants
-API_URL = 'https://55ixs3z8q0.execute-api.eu-central-1.amazonaws.com/st'
+API_URL = 'https://ea4ws37afh.execute-api.eu-central-1.amazonaws.com/st/attendify'
 FACEDETECT_PATH = 'data/haarcascade_frontalface_default.xml'
 NAMES_PATH = 'data/names.pkl'
 FACES_DATA_PATH = 'data/faces_data.pkl'
@@ -158,7 +158,7 @@ class FaceRecognitionApp:
         self.record_pause_end(start_pause_time + self.pause_time)
 
     def record_pause_start(self, start_time):
-        date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
+        date = datetime.strptime(date_str, "%d-%m-%Y").isoformat()
         timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "Start"]
         if self.pause_time == 10:
@@ -206,17 +206,15 @@ class FaceRecognitionApp:
             if filename.startswith("Attendance_") and filename.endswith(".csv"):
                 try:
                     date_str = filename.split("_")[1].split(".")[0]
-                    # Überprüfen, ob das Datum im richtigen Format vorliegt
                     date = datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
                 except ValueError:
-                    # Wenn das Datum nicht konvertiert werden kann, überspringe diese Datei
                     print(f"Skipping file due to incorrect date format: {filename}")
                     continue
 
                 true_count = 0
                 false_count = 0
                 total_count = 0
-                name = None
+                name_counts = {}
 
                 with open(os.path.join(attendance_dir, filename), 'r') as csvfile:
                     reader = csv.DictReader(csvfile)
@@ -225,15 +223,19 @@ class FaceRecognitionApp:
                         name = row['NAME']
                         if row['STATUS'] == 'true':
                             true_count += 1
+                            name_counts[name] = name_counts.get(name, 0) + 1
                         elif row['STATUS'] == 'false':
                             false_count += 1
+
+                # انتخاب نامی که بیشترین تکرار را دارد
+                most_common_name = max(name_counts, key=name_counts.get) if name_counts else "Unknown"
 
                 if total_count > 0:
                     true_percentage = round(Decimal(true_count) / Decimal(total_count) * Decimal(100), 2)
                     false_percentage = round(Decimal(false_count) / Decimal(total_count) * Decimal(100), 2)
 
                     results.append({
-                        'name': name,
+                        'name': most_common_name,
                         'date': date,
                         'true_percentage': str(true_percentage),
                         'false_percentage': str(false_percentage)
