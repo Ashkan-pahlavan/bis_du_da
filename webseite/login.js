@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const result = await sendRequest(
-          "https://el5t5k2kq0.execute-api.eu-central-1.amazonaws.com/st/register",
+          "https://dwyc2ibbt2.execute-api.eu-central-1.amazonaws.com/st/attendify",
           { email, password }
         );
 
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const result = await sendRequest(
-          "https://el5t5k2kq0.execute-api.eu-central-1.amazonaws.com/st/login",
+          "https://18mr8n4w71.execute-api.eu-central-1.amazonaws.com/st/attendify",
           { email, password }
         );
 
