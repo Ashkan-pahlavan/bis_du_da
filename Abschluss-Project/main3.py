@@ -158,7 +158,7 @@ class FaceRecognitionApp:
         self.record_pause_end(start_pause_time + self.pause_time)
 
     def record_pause_start(self, start_time):
-        date = datetime.strptime(date_str, "%d-%m-%Y").isoformat()
+        date = datetime.fromtimestamp(start_time).strftime("%d-%m-%Y")
         timestamp = datetime.fromtimestamp(start_time).strftime("%H:%M:%S")
         pause_record = ["Paused", timestamp, "Start"]
         if self.pause_time == 10:
@@ -227,7 +227,6 @@ class FaceRecognitionApp:
                         elif row['STATUS'] == 'false':
                             false_count += 1
 
-                # انتخاب نامی که بیشترین تکرار را دارد
                 most_common_name = max(name_counts, key=name_counts.get) if name_counts else "Unknown"
 
                 if total_count > 0:
@@ -242,8 +241,6 @@ class FaceRecognitionApp:
                     })
 
         return results
-
-
 
     def analyze_pause(self, pause_dir='pause'):
         pause_data = []
